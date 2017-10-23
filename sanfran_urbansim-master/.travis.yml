@@ -1,0 +1,33 @@
+language: python
+sudo: false
+python:
+- '2.7'
+- '3.5'
+install:
+- if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
+    wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh;
+  else
+    wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+  fi
+- bash miniconda.sh -b -p $HOME/miniconda
+- export PATH="$HOME/miniconda/bin:$PATH"
+- hash -r
+- conda config --set always_yes yes --set changeps1 no
+- conda update -q conda
+# Useful for debugging any issues with conda
+- conda info -a
+- >
+  conda create -q -n test-environment
+  python=$TRAVIS_PYTHON_VERSION
+  cytoolz ipython-notebook jinja2 matplotlib numpy pandas patsy pip scipy
+  statsmodels pytables pytest pyyaml
+- source activate test-environment
+- pip install orca bottle simplejson zbox
+- pip install https://github.com/udst/urbansim/archive/master.zip
+before_script:
+- jupyter nbconvert --to python Simulation.ipynb
+script:
+- python Simulation.py
+notifications:
+  slack:
+    secure: ZxKN3Ru/fm3MJx1WaspMMEwKSuXHc5cptS+vjrjqL8Ow0eldubHBPNsIZCbn8RaJuTKuH1koV+PzgQxbOL9CSi4nodtU2ArX9qbAkfqlb3vAkpddXm6Z0m1ylSseWz3tEuMg5xdmYWckaTFYOaTfSw3k3+gwIEsNSKenba//Yow=
