@@ -7,8 +7,6 @@ def my_range(start, end, step):
         start += step
         return
     
-#There are 147499 parcels to analyze with this code
-#Bring in the indices sorted
 
 ############################
 ############################
@@ -17,68 +15,38 @@ def my_range(start, end, step):
 ############################
 
 def NoInterventionGreenRoof():
-    import pandas as pd
-    index = 0
-    data = pandas.read_csv('data.csv')
-    for index in my_range(0, len(data.index), 1):
-        building_size = (data['stories'][index])/(data['sq_ft'][index])     
-        #Initialization of assumed and derived variables
-        green_cost_per_sqft = 12
-        green_roof_min = 0
-        building_size = parcel_size * parcel_coverage
-        conventional_cost_per_sqft = green_cost_per_sqft/2
-        green_roof_benefits = 0
-        building_age = 40
-        annual_benefit_per_area = 1.23
-        annual_maintenance_costs_per_area = 0.02 
-        min_green_area = green_roof_min * building_size
-        min_green_cost = green_roof_min * green_cost_per_sqft
-        min_green_benefits= green_roof_min*building_size*annual_benefit_per_area*building_age
-        best_size = green_roof_min
-        best_benefit = min_green_benefits - min_green_cost
-        best_conv = (building_size*(1-green_roof_min)*conventional_cost_per_sqft) #Avoid capital costs
+data = pd.read_csv('data.csv')
+building_size_dict = {}
+roofins_dict = {}
+green_roof_ben_dict = {}
+green_roof_cost_dict = {}
+roof_cost_at_20yrs_dict = {}
+size_dict = {}
 
-        
-        #Calculation of Output variables
-        
-        #If the building is large enough to allow bulk discounting to begin (happens in most cases)
-        if (building_size > 500):
-            green_cost_per_sqft = 23.907*(green_cost_per_sqft**(-0.078))
-        
-        for current_size in my_range(green_roof_min, 1, 0.01):
-            roof_cost_at_20yrs = (building_size*(1-current_size)*conventional_cost_per_sqft) #Avoid capital costs
-            green_roof_cost = current_size * building_size * green_cost_per_sqft + (building_age * annual_maintenance_costs_per_area * building_size * current_size)
-            green_roof_benefits = building_age * annual_benefit_per_area * building_size * current_size + roof_cost_at_20yrs
-            if(green_roof_benefits - green_roof_cost > best_benefit):
-                best_size = current_size
-                best_green_cost = green_roof_cost
-                best_green_benefits = green_roof_benefits
-                best__green_net_benefit = green_roof_benefits - green_roof_cost
-                best_conv = roof_cost_at_20yrs
-        
-        if(best_benefit > 0):
-            green_ins.update({index : 1}) #this green roof variable can be stored in the final
-        else:
-                green_ins.update({index : 1})
-        
-        
-        roof_cost_at_20yrs_dict.update({index : best_conv})
-        green_roof_benefit_dict.update({index : best_green_benefits})
-        green_roof_cost_dict.update({index : best_green_cost})
-        green_roof_net_benefit_dict.update({index : best__green_net_benefit})
-        index = index +1
+for index in range(-1, 2000, 1):
+    index = index + 1
+    best_ben = 0
+    building_size = (data['sq_ft'][index])/(data['stories'][index])
+    roof_cost_at_20yrs = building_size * 6
+    building_size_dict.update({index : building_size})
     
-    #Print results
-    
-    roofinstalled = pd.Series(roofinstalled_dict)
-    green_roof_benefit = pd.Series(green_roof_benefit_dict)
-    green_roof_cost = pd.Series(green_roof_cost_dict)
-    green_roof_net_benefit = pd.Series(green_roof_net_benefit_dict)
-    conv_roof_maintenance = pd.Series(roof_cost_at_20yrs_dict)
-    buildings = pd.DataFrame({"green ins" : roofinstalled_dict, "green ben" : green_roof_benefit_dict, "green cost" : green_roof_cost_dict, "green net": green_roof_net_benefit_dict, "conv maintain" :conv_roof_maintenance})
-    buildings.to_csv("no_action.csv")
-    return "Check no_action.csv"
+    for size_ratio in my_range (0, 1.01, .01):
+        green_roof_cost = 23.907*(12**(-0.078)) *size_ratio * building_size + (40*.02*building_size*size_ratio)
+        green_roof_ben = 1.23 * size_ratio * building_size * 40 + (building_size * 6 * (1-size_ratio))
+        if(green_roof_ben - green_roof_cost > best_ben):
+            roof_ins = 1
+            best_size = size_ratio * building_size
+            size_dict.update({index : best_size})
+            roofins_dict.update({index : roof_ins})
+            green_roof_ben_dict.update({index : green_roof_ben})
+            green_roof_cost_dict.update({index : green_roof_cost})
+            roof_cost_at_20yrs = building_size * 6 * (1-size_ratio)            
+            roof_cost_at_20yrs_dict.update({index : roof_cost_at_20yrs})
 
+buildings = pd.DataFrame({"building size" : building_size_dict, "best_size" : size_dict, "roofins" : roofins_dict, "green_ben" : green_roof_ben_dict, "green_cost" : green_roof_cost_dict, "cost_20yr" : roof_cost_at_20yrs_dict, })
+writer = pd.ExcelWriter('no_action.xlsx')
+buildings.to_excel(writer,'no_action')
+writer.save()
     
     
 ############################
@@ -87,187 +55,149 @@ def NoInterventionGreenRoof():
 ############################
 ############################
 
+def SanFranGreenRoof():
+data = pd.read_csv('data.csv')
+building_size_dict = {}
+roofins_dict = {}
+green_roof_ben_dict = {}
+green_roof_cost_dict = {}
+roof_cost_at_20yrs_dict = {}
+size_dict = {}
+mandated_dict = {}
+for index in range(-1, 2000, 1):
+    index = index + 1
+    best_ben = 0
+    building_size = (data['sq_ft'][index])/(data['stories'][index])
+    roof_cost_at_20yrs = building_size * 6
+    building_size_dict.update({index : building_size})
+    
+    if(data['building_type_id'][index] != 'Residential' and building_size < 15625):
+        mandated_dict.update({index : 1})
+        green_roof_cost = 23.907*(12**(-0.078)) * building_size + (40*.02*building_size*size_ratio)
+        green_roof_ben = 1.23 * building_size * 40 + (building_size * 6 * (1-size_ratio))
+        roof_ins = 1
+        best_size = building_size
+        size_dict.update({index : 1})
+        roofins_dict.update({index : roof_ins})
+        green_roof_ben_dict.update({index : green_roof_ben})
+        green_roof_cost_dict.update({index : green_roof_cost})
+        roof_cost_at_20yrs_dict.update({index : 0})
+        
+    elif(data['building_type_id'][index] != 'Residential' and building_size >= 15625):
+        mandated_dict.update({index : 1})
+        green_roof_cost = 23.907*(12**(-0.078)) * 15625 + (40*.02*15625*size_ratio)
+        green_roof_ben = 1.23 * 15625 * 40 + (15625 * 6 * (1-size_ratio))
+        roof_ins = 1
+        best_size = 15625
+        size_dict.update({index : 1})
+        roofins_dict.update({index : roof_ins})
+        green_roof_ben_dict.update({index : green_roof_ben})
+        green_roof_cost_dict.update({index : green_roof_cost})
+        roof_cost_at_20yrs_dict.update({index : 0})
+    
+    else:
+        mandated_dict.update({index : 0})
+        for size_ratio in my_range (0, 1.01, .01):
+            green_roof_cost = 23.907*(12**(-0.078)) *size_ratio * building_size + (40*.02*building_size*size_ratio)
+            green_roof_ben = 1.23 * size_ratio * building_size * 40 + (building_size * 6 * (1-size_ratio)) + (.05*size_ratio*building_size)
+            if(green_roof_ben - green_roof_cost > best_ben):
+                roof_ins = 1
+                best_size = size_ratio * building_size
+                size_dict.update({index : best_size})
+                roofins_dict.update({index : roof_ins})
+                green_roof_ben_dict.update({index : green_roof_ben})
+                green_roof_cost_dict.update({index : green_roof_cost})
+                roof_cost_at_20yrs = building_size * 6 * (1-size_ratio)            
+                roof_cost_at_20yrs_dict.update({index : roof_cost_at_20yrs})
 
-
-
-#def SanFranGreenRoof():
-#    index = 0
-#    for(all buildings in the table):
-#        index += 1 #this is used as a tracker to create the data table
-#        
-#        #Initialization of assumed and derived variables
-#        green_cost_per_sqft = 12
-#        green_roof_min = 0
-#        building_size = parcel_size * parcel_coverage
-#        conventional_cost_per_sqft = green_cost_per_sqft/2
-#        green_roof_benefits = 0
-#        building_age = 40
-#        annual_benefit_per_area = 1.23
-#        annual_maintenance_costs_per_area = 0.02 
-#        min_green_area = green_roof_min * building_size
-#        min_green_cost = green_roof_min * green_cost_per_sqft
-#        min_green_benefits= green_roof_min*building_size*annual_benefit_per_area*building_age
-#        best_size = green_roof_min
-#       best_benefit = min_green_benefits - min_green_cost
-#      best_conv = (building_size*(1-green_roof_min)*conventional_cost_per_sqft) #Avoid capital costs
-#
-#        #If the building is large enough to allow bulk discounting to begin (happens in most cases)
-#        if (building_size > 500):
-#            green_cost_per_sqft = 23.907*(green_cost_per_sqft**(-0.078))
-#
-#        
-#        if  (generaltype != 'Residential'): #This set of conditions only applies when the mandate applies
-#            if parcel_coverage * parcel_size < 15625: #If the building size is less then the max green roof size allowed
-#                green_roof_cost += green_cost_per_sqft * parcel_coverage * parcel_size #size of building (assume roof area is equal)
-#                roof_cost_at_20yrs = building_size*conventional_cost_per_sqft
-#                roof_benefits = building_age * annual_benefit_per_area * building_size + roof_cost_at_20yrs
-#                else:
-#                    roof_at_20yrs = 15625*conventional_cost_per_sqft
-#                    green_roof_cost = 15625 *green_cost_per_sqft #max allowable
-#                    green_roof_benefit = 156225 * building_age * annual_benefit_per_area + roof_cost_at_20yrs
-#                    print("Upper limit reached")
-#                    annual_benefit_per_area = 1.23
-#                    green_roof_benefits += building_age * annual_benefit_per_area * parcel_coverage * parcel_size  + roof_cost_at_20yrs
-#                    costs = costs + roof_cost - roof_benefits
-#            else: #Otherwise we carry out the decision making process as if there were no policy
-#                min_green_area = green_roof_min * building_size
-#                min_green_cost = green_roof_min * green_cost_per_sqft
-#                min_green_benefits = green_roof_min*building_size*annual_benefit_per_area*building_age
-#                best_size = green_roof_min
-#                best_benefit = min_green_benefits - min_green_cost
-#                for current_size in my_range(green_roof_min, 1, 0.01):
-#                    roof_cost_at_20yrs = (building_size*(1-current_size)*conventional_cost_per_sqft) #Avoid capital costs
-#                    green_roof_cost = current_size * building_size * green_cost_per_sqft + (building_age * #annual_maintenance_costs_per_area * building_size * current_size)
-#                    roof_benefits = building_age * annual_benefit_per_area * building_size * current_size + roof_cost_at_20yrs
-#                    if(green_roof_benefits - green_roof_cost > best_benefit):
-#                        best_size = current_size
-#                        best_conv = roof_cost_at_20yrs
-#                        best_green_roof_cost = green_roof_cost
-#                        best_green_roof_benefit = green_roof_benefit
-#                        best_net_benefit = green_roof_benefits - green_roof_cost
-#        
-#                if(best_benefit > 0):
-#            green_ins.update{index : 1} #this green roof variable can be stored in the final
-#            else:
-#                green_ins.update{index : 1}
-#        
-#        
-#        roof_cost_at_20yrs_dict.update({index : best_conv})
-#        green_roof_benefit_dict.update({index : best_benefit})
-#        green_roof_cost_dict.update({index : green_roof_cost})
-#        green_roof_net_benefit_dict.update({index : green_roof_net_benefit})
-               
-    #Print results
-#    employee = pd.Series(employed_dict)
-#    rents = pd.Series(rent_dict)
-#    vacancies = pd.Series(vacant_dict)
-#    roofinstalled = pd.Series(roofinstalled_dict)
-#    employment_density = pd.Series(employment_density_dict)
-#    incomes = pd.Series(income_dict)
-#    project_cost = pd.Series(project_cost_dict)
-#    green_roof_benefit = pd.Series(green_roof_benefit_dict)
-#    green_roof_cost = pd.Series(green_roof_cost_dict)
-#    green_roof_net_benefit = pd.Series(green_roof_net_benefit_dict)
-#    property_values = pd.Series(property_value_dict)
-#    conv_roof_maintenance = pd.Series(roof_cost_at_20yrs_dict)
-#    buildings = pd.DataFrame({"income": incomes, "job" : employed_dict,"job density": employment_density_dict, "prop val": #property_value_dict, "green ins" : roofinstalled_dict, "green ben" : green_roof_benefit_dict, "green cost" : green_roof_cost_dict, "green net": green_roof_net_benefit_dict, "rent": rent_dict, "vacant" : vacancies, "conv maintain" :conv_roof_maintenance})
-#    buildings.to_csv("san_fran_greenroof.csv")
-#    return "Check san_fran_greenroof.csv"
-
+buildings = pd.DataFrame({"building size" : building_size_dict, "best_size" : size_dict, "roofins" : roofins_dict, "green_ben" : green_roof_ben_dict, "green_cost" : green_roof_cost_dict, "cost_20yr" : roof_cost_at_20yrs_dict, "mandated" : mandated_dict})
+writer = pd.ExcelWriter('san_fran.xlsx')
+buildings.to_excel(writer,'san_fran')
+writer.save()
 ############################
 ############################
 #TORONTO STYLE POLCIY TESTS
 ############################
 ############################
+building_size_dict = {}
+roofins_dict = {}
+green_roof_ben_dict = {}
+green_roof_cost_dict = {}
+roof_cost_at_20yrs_dict = {}
+size_dict = {}
+mandated_dict = {}
+green_roof_min_dict = {}
+for index in range(-1, 2000, 1):
+    index = index + 1
+    best_ben = 0
+    building_size = (data['sq_ft'][index])/(data['stories'][index])
+    roof_cost_at_20yrs = building_size * 6
+    building_size_dict.update({index : building_size})
+    if(data['building_type_id'][index] != 'Residential' or ((data['building_type_id'][index] == 'Residential' and data['stories'][index] > 6))):
+        mandated_dict.update({index : 1})
+        if(building_size > 21525 and building_size <= 53800):
+            green_roof_min = .2
+        elif(building_size > 53800 and building_size <= 107625):
+            green_roof_min = .3 
+        elif(building_size > 107625 and building_size <= 161450):
+            green_roof_min = .4 
+        elif(building_size > 161450 and building_size <= 215275):
+            green_roof_min = .5 
+        elif (building_size > 215275):
+            green_roof_min = .6
+        else:
+            green_roof_min = 0
+              
+        green_roof_min_dict.update( {index : green_roof_min})
+        green_roof_cost = 23.907*(12**(-0.078)) * building_size + (40*.02*building_size*green_roof_min)
+        green_roof_ben = 1.23 * building_size * 40 + (building_size * 6 * (1-green_roof_min))
+        roof_ins = 1
+        best_size = building_size * green_roof_min
+        size_dict.update({index : 1})
+        roofins_dict.update({index : roof_ins})
+        green_roof_ben_dict.update({index : green_roof_ben})
+        green_roof_cost_dict.update({index : green_roof_cost})
+        roof_cost_at_20yrs_dict.update({index : 0})
+
+        for size_ratio in my_range (green_roof_min, 1.01, .01):
+            green_roof_cost = 23.907*(12**(-0.078)) *size_ratio * building_size + (40*.02*building_size*size_ratio)
+            green_roof_ben = 1.23 * size_ratio * building_size * 40 + (building_size * 6 * (1-size_ratio)) + (.05*size_ratio*building_size)
+            if(green_roof_ben - green_roof_cost > best_ben):
+                roof_ins = 1
+                best_size = size_ratio * building_size
+                size_dict.update({index : best_size})
+                roofins_dict.update({index : roof_ins})
+                green_roof_ben_dict.update({index : green_roof_ben})
+                green_roof_cost_dict.update({index : green_roof_cost})
+                roof_cost_at_20yrs = building_size * 6 * (1-size_ratio)            
+                roof_cost_at_20yrs_dict.update({index : roof_cost_at_20yrs})
+
+    else:
+        mandated_dict.update({index : 0})
+        green_roof_min_dict.update( {index : 0})
+        for size_ratio in my_range (0, 1.01, .01):
+            green_roof_cost = 23.907*(12**(-0.078)) *size_ratio * building_size + (40*.02*building_size*size_ratio)
+            green_roof_ben = 1.23 * size_ratio * building_size * 40 + (building_size * 6 * (1-size_ratio)) + (.05*size_ratio*building_size)
+            if(green_roof_ben - green_roof_cost > best_ben):
+                roof_ins = 1
+                best_size = size_ratio * building_size
+                size_dict.update({index : best_size})
+                roofins_dict.update({index : roof_ins})
+                green_roof_ben_dict.update({index : green_roof_ben})
+                green_roof_cost_dict.update({index : green_roof_cost})
+                roof_cost_at_20yrs = building_size * 6 * (1-size_ratio)            
+                roof_cost_at_20yrs_dict.update({index : roof_cost_at_20yrs})
+
+buildings = pd.DataFrame({"building size" : building_size_dict, "best_size" : size_dict, "roofins" : roofins_dict, "green_ben" : green_roof_ben_dict, "green_cost" : green_roof_cost_dict, "cost_20yr" : roof_cost_at_20yrs_dict, "mandated" : mandated_dict, "green_min" : green_roof_min_dict})
+writer = pd.ExcelWriter('toronto.xlsx')
+buildings.to_excel(writer,'toronto')
+writer.save()
 
 
 
 
-#def TorontoGreenRoof(): 
-#    index = 0
-#    for(all buildings in the table):
-#        index += 1 #this is used as a tracker to create the data table
-#        
-#        #Initialization of assumed and derived variables
-#        green_cost_per_sqft = 12
-#        green_roof_min = 0
-#        building_size = parcel_size * parcel_coverage
-#        conventional_cost_per_sqft = green_cost_per_sqft/2
-#        green_roof_benefits = 0
-#        building_age = 40
-#        annual_benefit_per_area = 1.23
-#        annual_maintenance_costs_per_area = 0.02 
-#            
-#        #Computation of Output variables
-#        
-#        #If the building is large enough to allow bulk discounting to begin (happens in most cases)
-#        if (building_size > 500):
-#            green_cost_per_sqft = 23.907*(green_cost_per_sqft**(-0.078))
-#        
-#        #comparison values from policy and converted into sq. ft.
-#        if  not residential or (residential and stories > 6): #This set of conditions only applies when the mandate applies
-#            green_roof = 1
-#            mandate = 1
-#            if(building_size > 21525 and building_size <= 53800):
-#                green_roof_min = .2
-#            elif(building_size > 53800 and building_size <= 107625):
-#                green_roof_min = .3 
-#            elif(building_size > 107625 and building_size <= 161450):
-#                green_roof_min = .4 
-#            elif(building_size > 161450 and building_size <= 215275):
-#                green_roof_min = .5 
-#            elif (building_size > 215275):
-#                green_roof_min = .6
-#            else:
-#                green_roof_min = 0
-#
-#        min_green_area = green_roof_min * building_size
-#        best_conv = (building_size*(1-green_roof_min)*conventional_cost_per_sqft) #Avoid capital costs
-#        min_green_cost = min_green_area * green_cost_per_sqft
-#        min_green_benefits = green_roof_min*building_size*annual_benefit_per_area*building_age + roof_cost_at_20yrs
-#        best_size = green_roof_min
-#        best_benefit = min_green_benefits - min_green_cost
-#        
-#        for current_size in my_range(green_roof_min, 1, 0.01):
-#            green_roof_cost = current_size * building_size * green_cost_per_sqft + (building_age * annual_maintenance_costs_per_area * #building_size * current_size)
-#            roof_cost_at_20yrs = (building_size*(1-current_size)*conventional_cost_per_sqft) #Avoid capital costs
-#            green_roof_benefits = building_age * annual_benefit_per_area * building_size * current_size + roof_cost_at_20yrs
-#            if(green_roof_benefits - green_roof_cost > best_benefit):
-#                best_size = current_size
-#                best_green_cost = green_roof_cost
-#                best_green_benefits = green_roof_benefits
-#                best__green_net_benefit = green_roof_benefits - green_roof_cost
-#                best_conv = roof_cost_at_20yrs
-#
-#        
-#        if(best_benefit > 0):
-#            green_ins.update{index : 1} #this green roof variable can be stored in the final
-#            else:
-#                green_ins.update{index : 1}
-#             
-#        roof_cost_at_20yrs_dict.update({index : best_conv})
-#        green_roof_benefit_dict.update({index : best_green_benefits})
-#        green_roof_cost_dict.update({index : best_green_cost})
-#        green_roof_net_benefit_dict.update({index : best__green_net_benefit})
-#    
-    #Print results
-#    employee = pd.Series(employed_dict)
-#    rents = pd.Series(rent_dict)
-#    vacancies = pd.Series(vacant_dict)
-#    roofinstalled = pd.Series(roofinstalled_dict)
-#    employment_density = pd.Series(employment_density_dict)
-#    incomes = pd.Series(income_dict)
-#    project_cost = pd.Series(project_cost_dict)
-#    green_roof_benefit = pd.Series(green_roof_benefit_dict)
-#    green_roof_cost = pd.Series(green_roof_cost_dict)
-#    green_roof_net_benefit = pd.Series(green_roof_net_benefit_dict)
-#    property_values = pd.Series(property_value_dict)
-#    conv_roof_maintenance = pd.Series(roof_cost_at_20yrs_dict)
-#    buildings = pd.DataFrame({"income": incomes, "job" : employed_dict,"job density": employment_density_dict, "prop val": property_value_dict, "green ins" : roofinstalled_dict, "green ben" : green_roof_benefit_dict, "green cost" : green_roof_cost_dict, "green net": green_roof_net_benefit_dict, "rent": rent_dict, "vacant" : vacancies, "conv maintain" :conv_roof_maintenance})
-#        buildings.to_csv("tornoto_greenroof.csv")
-#    return "Check tornoto_greenroof.csv"
-
-
+def TorontoGreenRoof(): 
+data = pd.read_csv('data.csv')
 
 ############################
 ############################
@@ -277,76 +207,34 @@ def NoInterventionGreenRoof():
 
 
 
-#def ChicagoGreenRoof():
-#    index = 0
-#    for(all buildings in the table):
-#        index += 1 #this is used as a tracker to create the data table
-#        
-        #Initialization of assumed and derived variables
-#        green_cost_per_sqft = 12
-#        green_roof_min = 0
-#        building_size = parcel_size * parcel_coverage
-#        conventional_cost_per_sqft = green_cost_per_sqft/2
-#        green_roof_benefits = 0
-#        building_age = 40
-#        annual_benefit_per_area = 1.23
-#        annual_maintenance_costs_per_area = 0.02 
-#        min_green_area = green_roof_min * building_size
-#        min_green_cost = green_roof_min * green_cost_per_sqft
-#        min_green_benefits= green_roof_min*building_size*annual_benefit_per_area*building_age
-#        best_size = green_roof_min
-#        best_benefit = min_green_benefits - min_green_cost
-#        best_conv = (building_size*(1-green_roof_min)*conventional_cost_per_sqft) #Avoid capital costs
-#        discount = 0.05 #Chicago offers $0.05 off building fees per sqft of green roofing
-#
-#        #If the building is large enough to allow bulk discounting to begin (happens in most cases)
-#        if (building_size > 500):
-#            green_cost_per_sqft = 23.907*(green_cost_per_sqft**(-0.078))
+def ChicagoGreenRoof():
+data = pd.read_csv('data.csv')
+building_size_dict = {}
+roofins_dict = {}
+green_roof_ben_dict = {}
+green_roof_cost_dict = {}
+roof_cost_at_20yrs_dict = {}
+size_dict = {}
+for index in range(-1, 2000, 1):
+    index = index + 1
+    best_ben = 0
+    building_size = (data['sq_ft'][index])/(data['stories'][index])
+    roof_cost_at_20yrs = building_size * 6
+    building_size_dict.update({index : building_size})
+    for size_ratio in my_range (0, 1.01, .01):
+        green_roof_cost = 23.907*(12**(-0.078)) *size_ratio * building_size + (40*.02*building_size*size_ratio)
+        green_roof_ben = 1.23 * size_ratio * building_size * 40 + (building_size * 6 * (1-size_ratio)) + (.05*size_ratio*building_size)
+        if(green_roof_ben - green_roof_cost > best_ben):
+            roof_ins = 1
+            best_size = size_ratio * building_size
+            size_dict.update({index : best_size})
+            roofins_dict.update({index : roof_ins})
+            green_roof_ben_dict.update({index : green_roof_ben})
+            green_roof_cost_dict.update({index : green_roof_cost})
+            roof_cost_at_20yrs = building_size * 6 * (1-size_ratio)            
+            roof_cost_at_20yrs_dict.update({index : roof_cost_at_20yrs})
 
-
-#        min_green_area = green_roof_min * building_size 
-#        min_green_cost = green_roof_min * green_cost_per_sqft 
-#        min_green_benefits = green_roof_min*building_size*annual_benefit_per_area*green_roof_life
-#        best_size = green_roof_min
-#        best_benefit = min_green_benefits - min_green_cost
-#
-#        for current_size in my_range(green_roof_min, 1.01, 0.01):
-#            initial_benefit = discount*current_size*building_size #Discounts from Chicago
-#            roof_cost_at_20yrs = (building_size*(1-current_size)*conventional_cost_per_sqft) #Avoid capital costs
-#            green_roof_cost = current_size * building_size * green_cost_per_sqft + (green_roof_life * annual_maintenance_costs_per_area * #building_size * current_size)
-#            green_roof_benefit = (green_roof_life * annual_benefit_per_area * building_size * current_size) + initial_benefit  + roof_cost_at_20yrs
-#            if(green_roof_benefits - green_roof_cost > best_benefit): 
-#                best_size = current_size
-#                best_benefit = green_roof_benefit - green_roof_cost
-#                roof_cost_at_20yrs_dict[index] = roof_cost_at_20yrs
-#                green_roof_benefit_dict[index] = best_benefit
-#                green_roof_cost_dict[index] = green_roof_cost
-#        
-#        if(best_benefit > 0):
-#            green_ins.update{index : 1} #this green roof variable can be stored in the final
-#            else:
-#                green_ins.update{index : 1}
-#            
-#
-#        roof_cost_at_20yrs_dict.update({index : best_conv})
-#        green_roof_benefit_dict.update({index : best_benefit})
-#        green_roof_cost_dict.update({index : green_roof_cost})
-#        green_roof_net_benefit_dict.update({index : green_roof_net_benefit})
-# 
-#    #Print results
-#    employee = pd.Series(employed_dict)
-#    rents = pd.Series(rent_dict)
-#    vacancies = pd.Series(vacant_dict)
-#    roofinstalled = pd.Series(roofinstalled_dict)
-#    employment_density = pd.Series(employment_density_dict)
-#    incomes = pd.Series(income_dict)
-#    project_cost = pd.Series(project_cost_dict)
-#    green_roof_benefit = pd.Series(green_roof_benefit_dict)
-#    green_roof_cost = pd.Series(green_roof_cost_dict)
-#    green_roof_net_benefit = pd.Series(green_roof_net_benefit_dict)
-#    property_values = pd.Series(property_value_dict)
-#    conv_roof_maintenance = pd.Series(roof_cost_at_20yrs_dict)
-#    buildings = pd.DataFrame({"income": incomes, "job" : employed_dict,"job density": employment_density_dict, "prop val": #property_value_dict, "green ins" : roofinstalled_dict, "green ben" : green_roof_benefit_dict, "green cost" : green_roof_cost_dict, "green net": green_roof_net_benefit_dict, "rent": rent_dict, "vacant" : vacancies, "conv maintain" :conv_roof_maintenance})
-#    buildings.to_csv("chicago_greenroof.csv")
-#    return "Check chicago_greenroof.csv"
-#    
+buildings = pd.DataFrame({"building size" : building_size_dict, "best_size" : size_dict, "roofins" : roofins_dict, "green_ben" : green_roof_ben_dict, "green_cost" : green_roof_cost_dict, "cost_20yr" : roof_cost_at_20yrs_dict})
+writer = pd.ExcelWriter('chicago.xlsx')
+buildings.to_excel(writer,'chicago')
+writer.save()
