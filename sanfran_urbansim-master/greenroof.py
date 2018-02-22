@@ -1,5 +1,5 @@
 import pandas as pd
-
+data = pd.read_csv('data.csv')
 ##This is used to bound start and end of for loops
 def my_range(start, end, step):
     while start <= end:
@@ -19,7 +19,7 @@ def NoInterventionGreenRoof2():
 ############################
 
 def NoInterventionGreenRoof():
-    data = pd.read_csv('data.csv')
+    
     building_size_dict = {}
     roofins_dict = {}
     green_roof_ben_dict = {}
@@ -61,7 +61,6 @@ def NoInterventionGreenRoof():
 ############################
 
 def SanFranGreenRoof():
-    data = pd.read_csv('data.csv')
     building_size_dict = {}
     roofins_dict = {}
     green_roof_ben_dict = {}
@@ -130,7 +129,6 @@ def SanFranGreenRoof():
 
 
 def TorontoGreenRoof(): 
-    data = pd.read_csv('data.csv')
     building_size_dict = {}
     roofins_dict = {}
     green_roof_ben_dict = {}
@@ -215,7 +213,6 @@ def TorontoGreenRoof():
 
 
 def ChicagoGreenRoof():
-    data = pd.read_csv('data.csv')
     building_size_dict = {}
     roofins_dict = {}
     green_roof_ben_dict = {}
@@ -245,4 +242,3 @@ def ChicagoGreenRoof():
     writer = pd.ExcelWriter('chicago.xlsx')
     buildings.to_excel(writer,'chicago')
     writer.save()
-    return
