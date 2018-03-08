@@ -35,8 +35,8 @@ def NoInterventionGreenRoof():
         building_size_dict.update({index : building_size})
 
         for size_ratio in my_range (0, 1.01, .01):
-            green_roof_cost = 23.907*(12**(-0.078)) *size_ratio * building_size + (40*.02*building_size*size_ratio)
-            green_roof_ben = 1.23 * size_ratio * building_size * 40 + (building_size * 6 * (1-size_ratio))
+            green_roof_cost = 23.907*(12**(-0.078)) *size_ratio * building_size + (40*.02*building_size*size_ratio) + (building_size*size*ratio*.21)
+            green_roof_ben = .23 * size_ratio * building_size * 40 + (building_size * 6 * (1-size_ratio))
             if(green_roof_ben - green_roof_cost > best_ben):
                 roof_ins = 1
                 best_size = size_ratio * building_size
@@ -77,8 +77,8 @@ def SanFranGreenRoof():
 
         if(data['building_type_id'][index] != 'Residential' and building_size < 15625):
             mandated_dict.update({index : 1})
-            green_roof_cost = 23.907*(12**(-0.078)) * building_size + (40*.02*building_size*size_ratio)
-            green_roof_ben = 1.23 * building_size * 40 + (building_size * 6 * (1-size_ratio))
+            green_roof_cost = 23.907*(12**(-0.078)) *size_ratio * building_size + (40*.02*building_size*size_ratio) + (building_size*size*ratio*.21)
+            green_roof_ben = .23 * size_ratio * building_size * 40 + (building_size * 6 * (1-size_ratio))
             roof_ins = 1
             best_size = building_size
             size_dict.update({index : 1})
@@ -89,8 +89,8 @@ def SanFranGreenRoof():
 
         elif(data['building_type_id'][index] != 'Residential' and building_size >= 15625):
             mandated_dict.update({index : 1})
-            green_roof_cost = 23.907*(12**(-0.078)) * 15625 + (40*.02*15625*size_ratio)
-            green_roof_ben = 1.23 * 15625 * 40 + (15625 * 6 * (1-size_ratio))
+            green_roof_ben = .23 * size_ratio * building_size * 40 + (building_size * 6 * (1-size_ratio))
+            green_roof_cost = 23.907*(12**(-0.078)) *size_ratio * building_size + (40*.02*building_size*size_ratio) +(building_size*size*ratio*.21)
             roof_ins = 1
             best_size = 15625
             size_dict.update({index : 1})
@@ -102,8 +102,8 @@ def SanFranGreenRoof():
         else:
             mandated_dict.update({index : 0})
             for size_ratio in my_range (0, 1.01, .01):
-                green_roof_cost = 23.907*(12**(-0.078)) *size_ratio * building_size + (40*.02*building_size*size_ratio)
-                green_roof_ben = 1.23 * size_ratio * building_size * 40 + (building_size * 6 * (1-size_ratio)) + (.05*size_ratio*building_size)
+            green_roof_cost = 23.907*(12**(-0.078)) *size_ratio * building_size + (40*.02*building_size*size_ratio) + (building_size*size*ratio*.21)  
+            green_roof_ben = .23 * size_ratio * building_size * 40 + (building_size * 6 * (1-size_ratio))
                 if(green_roof_ben - green_roof_cost > best_ben):
                     roof_ins = 1
                     best_size = size_ratio * building_size

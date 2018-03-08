@@ -292,7 +292,7 @@ class SqFtProForma(object):
         array
             The cost per sqft for this unit mix and height.
 
-        """
+        """         
         c = self.config
         # stories to heights
         heights = stories * c.height_per_story
@@ -301,9 +301,10 @@ class SqFtProForma(object):
         # this will get set to nan later
         costs[np.isnan(heights)] = 0
         # compute cost with matrix multiply
-        costs = np.dot(np.squeeze(c.costs[costs.astype('int32')]), use_mix)
+        costs = np.dot(np.squeeze(c.costs[costs.astype('int32')]), use_mix) + 1000000
         # some heights aren't allowed - cost should be nan
         costs[np.isnan(stories).flatten()] = np.nan
+
         return costs.flatten()
 
     def _generate_lookup(self):
