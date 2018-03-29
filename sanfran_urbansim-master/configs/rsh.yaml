@@ -20,6 +20,8 @@ ytransform: np.exp
 
 fitted: true
 
+fit_rsquared: 0.6911196811962139
+
 fit_parameters:
     Coefficient:
         I(year_built < 1940)[T.True]: 0.05009463768985373
@@ -53,5 +55,3 @@ fit_parameters:
         sum_residential_units: 16.21141076434245
 
 fit_rsquared_adj: 0.6911031414201065
-
-fit_rsquared: 0.6911196811962139

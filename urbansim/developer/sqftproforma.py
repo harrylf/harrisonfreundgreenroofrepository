@@ -301,7 +301,7 @@ class SqFtProForma(object):
         # this will get set to nan later
         costs[np.isnan(heights)] = 0
         # compute cost with matrix multiply
-        costs = np.dot(np.squeeze(c.costs[costs.astype('int32')]), use_mix) + 1000000
+        costs = np.dot(np.squeeze(c.costs[costs.astype('int32')]), use_mix) #+ c.NoInterventionGreenRoof()
         # some heights aren't allowed - cost should be nan
         costs[np.isnan(stories).flatten()] = np.nan
 
