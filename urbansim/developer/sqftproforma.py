@@ -301,10 +301,13 @@ class SqFtProForma(object):
         # this will get set to nan later
         costs[np.isnan(heights)] = 0
         # compute cost with matrix multiply
-        costs = np.dot(np.squeeze(c.costs[costs.astype('int32')]), use_mix) #+ c.NoInterventionGreenRoof()
+        costs = np.dot(np.squeeze(c.costs[costs.astype('int32')]), use_mix) #base line simulation
+        costs = np.dot(np.squeeze(c.costs[costs.astype('int32')]), use_mix) + c.NoInterventionGreenRoof() #greenroof economy added
+        #chicago style green roof economy added
+        #toronto style green roof economy added
+        #san fran style green roof economy added
         # some heights aren't allowed - cost should be nan
         costs[np.isnan(stories).flatten()] = np.nan
-
         return costs.flatten()
 
     def _generate_lookup(self):
@@ -382,7 +385,7 @@ class SqFtProForma(object):
                 df['stories'] = np.ceil(stories)
                 df['height'] = df.stories * c.height_per_story
                 df['build_cost_sqft'] = self._building_cost(uses_distrib, stories)
-
+                df['greendata'] = greenbuildings
                 df['build_cost'] = df.build_cost_sqft * df.building_sqft
                 df['park_cost'] = parking_cost
                 df['cost'] = df.build_cost + df.park_cost
@@ -649,6 +652,7 @@ class SqFtProForma(object):
             'max_profit_far': twod_get(maxprofitind, fars),
             'max_profit': twod_get(maxprofitind, profit),
             'parking_config': parking_config
+            'greendata': greenbuildings
         }, index=df.index)
 
         if pass_through:

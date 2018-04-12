@@ -22,6 +22,7 @@ def NoInterventionGreenRoof():
     green_roof_cost_dict = {}
     roof_cost_at_20yrs_dict = {}
     size_dict = {}
+    best_NPV = 0
     index = building_id
         best_ben = 0
         building_size = sq_ft/stories
@@ -41,12 +42,12 @@ def NoInterventionGreenRoof():
                 green_roof_cost_dict.update({index : green_roof_cost})
                 roof_cost_at_20yrs = building_size * 6 * (1-size_ratio)            
                 roof_cost_at_20yrs_dict.update({index : roof_cost_at_20yrs})
-
-    buildings = pd.DataFrame({"building size" : building_size_dict, "best_size" : size_dict, "roofins" : roofins_dict, "green_ben" : green_roof_ben_dict, "green_cost" : green_roof_cost_dict, "cost_20yr" : roof_cost_at_20yrs_dict, })
-    writer = pd.ExcelWriter('no_action.xlsx')
-    buildings.to_excel(writer,'no_action')
-    writer.save()
-    return
+                best_NPV = green_roof_ben = green_roof_cost
+#    greenbuildings = pd.DataFrame({"building size" : building_size_dict, "best_size" : size_dict, "roofins" : roofins_dict, "green_ben" : green_roof_ben_dict, "green_cost" : green_roof_cost_dict, "cost_20yr" : roof_cost_at_20yrs_dict, })
+#    writer = pd.ExcelWriter('no_action.xlsx')
+#    buildings.to_excel(writer,'no_action')
+#    writer.save()
+    return best_NPV
 
 
 ############################

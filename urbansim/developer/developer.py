@@ -93,7 +93,8 @@ class Developer(object):
         number_of_units : int
             the number of units that need to be built
         """
-        print("Number of agents: {:,}".format(num_agents))
+        
+        print("The Number of agents: {:,}".format(num_agents))
         print("Number of agent spaces: {:,}".format(int(num_units)))
         assert target_vacancy < 1.0
         target_units = int(max(num_agents / (1 - target_vacancy) - num_units, 0))
@@ -208,8 +209,7 @@ class Developer(object):
             p = df.max_profit_per_size.values / df.max_profit_per_size.sum()
 
         if df.net_units.sum() < target_units:
-            print("WARNING THERE WERE NOT ENOUGH PROFITABLE UNITS TO",
-                  "MATCH DEMAND")
+            print("WARNING THERE WERE NOT ENOUGH PROFITABLE UNITS TO MATCH DEMAND HERE IS A CHANGE",)
             build_idx = df.index.values
         elif target_units <= 0:
             build_idx = []
