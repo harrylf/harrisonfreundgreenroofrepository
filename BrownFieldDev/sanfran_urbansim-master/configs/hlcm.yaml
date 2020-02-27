@@ -1,0 +1,228 @@
+name: Household Location Choice Model
+
+model_type: segmented_discretechoice
+
+segmentation_col: income_quartile
+
+choosers_fit_filters: null
+
+choosers_predict_filters: null
+
+alts_fit_filters:
+- general_type == 'Residential'
+
+alts_predict_filters:
+- general_type == 'Residential'
+
+interaction_predict_filters: null
+
+choice_column: null
+
+sample_size: 100
+
+estimation_sample_size: 3000
+
+prediction_sample_size: null
+
+default_config:
+    model_expression: np.log1p(residential_sales_price) + np.log1p(unit_sqft) + sum_residential_units
+        + ave_unit_sqft + ave_lot_sqft + ave_income + hhsize + jobs + sfdu + renters
+        + poor + population - 1
+
+models:
+    0:
+        fit_parameters:
+            Coefficient:
+                ave_income: -0.4599043863538802
+                ave_lot_sqft: -0.11086821826162711
+                ave_unit_sqft: 0.3010996667952356
+                hhsize: -0.6443176111668866
+                jobs: 0.03226899099249496
+                np.log1p(residential_sales_price): -5.849131775993868e-14
+                np.log1p(unit_sqft): -0.35214452683045055
+                poor: 0.8058868404817858
+                population: -0.3190767224061753
+                renters: -0.5500771011035669
+                sfdu: -0.04505268625671115
+                sum_residential_units: 0.4019043772339861
+            Std. Error:
+                ave_income: 0.1400082514399415
+                ave_lot_sqft: 0.03759263133177948
+                ave_unit_sqft: 0.10849706725505237
+                hhsize: 0.14464399432742742
+                jobs: 0.03189529839860506
+                np.log1p(residential_sales_price): 2.5132255974339444
+                np.log1p(unit_sqft): 0.023445403540206643
+                poor: 0.15227955232198837
+                population: 0.17697452377053532
+                renters: 0.038813754993797286
+                sfdu: 0.01924333652895542
+                sum_residential_units: 0.10796488078577872
+            T-Score:
+                ave_income: -3.284837726519016
+                ave_lot_sqft: -2.9492007963779607
+                ave_unit_sqft: 2.7751871494131497
+                hhsize: -4.454506487897168
+                jobs: 1.011716228179456
+                np.log1p(residential_sales_price): -2.3273405228587332e-14
+                np.log1p(unit_sqft): -15.019768212842065
+                poor: 5.292153990430533
+                population: -1.8029528522415423
+                renters: -14.17222067773327
+                sfdu: -2.341209705963435
+                sum_residential_units: 3.7225473163948095
+        fitted: true
+        log_likelihoods:
+            convergence: -11262.625330083218
+            'null': -13815.51055796495
+            ratio: 0.18478399456688455
+        name: 0
+    1:
+        fit_parameters:
+            Coefficient:
+                ave_income: 0.41979553959373767
+                ave_lot_sqft: -0.23307615358153017
+                ave_unit_sqft: 0.2037229795199032
+                hhsize: -0.33077364841698614
+                jobs: 0.07834919998085803
+                np.log1p(residential_sales_price): -2.3060071814696935e-15
+                np.log1p(unit_sqft): -0.47003701613372234
+                poor: 0.4898336048575433
+                population: 0.35557168464320593
+                renters: -0.6840637843479258
+                sfdu: -0.05532930472273483
+                sum_residential_units: 0.04615741020576869
+            Std. Error:
+                ave_income: 0.18972339635353672
+                ave_lot_sqft: 0.040775745618618256
+                ave_unit_sqft: 0.10909402886747491
+                hhsize: 0.14003803655463384
+                jobs: 0.03255625065005442
+                np.log1p(residential_sales_price): 3.058599224123627
+                np.log1p(unit_sqft): 0.024175053100114568
+                poor: 0.16170148664664416
+                population: 0.18796379760747034
+                renters: 0.045413966949353395
+                sfdu: 0.019007647422528504
+                sum_residential_units: 0.11158294845176019
+            T-Score:
+                ave_income: 2.2126714346367544
+                ave_lot_sqft: -5.716048843386626
+                ave_unit_sqft: 1.8674072415767276
+                hhsize: -2.3620271788653615
+                jobs: 2.4065793331987098
+                np.log1p(residential_sales_price): -7.539422501914837e-16
+                np.log1p(unit_sqft): -19.443060339399825
+                poor: 3.029246143716323
+                population: 1.8917030256313265
+                renters: -15.062850270508367
+                sfdu: -2.910897045425868
+                sum_residential_units: 0.41366006944800865
+        fitted: true
+        log_likelihoods:
+            convergence: -12669.732416136163
+            'null': -13815.51055796495
+            ratio: 0.08293418741359648
+        name: 1
+    2:
+        fit_parameters:
+            Coefficient:
+                ave_income: 0.8267927820516727
+                ave_lot_sqft: -0.21256116433278507
+                ave_unit_sqft: 0.2063358868373096
+                hhsize: -0.4160206873773217
+                jobs: 0.02028581116837518
+                np.log1p(residential_sales_price): -2.953507426167051e-14
+                np.log1p(unit_sqft): -0.5378850687002122
+                poor: 0.1653394215696792
+                population: 0.5442848692818603
+                renters: -0.5741258607724818
+                sfdu: -0.0002420965065755689
+                sum_residential_units: 0.20175848161872015
+            Std. Error:
+                ave_income: 0.21676804772124364
+                ave_lot_sqft: 0.047374757905182995
+                ave_unit_sqft: 0.12652072065459102
+                hhsize: 0.14788029598211613
+                jobs: 0.032743214066197006
+                np.log1p(residential_sales_price): 3.4299847480934282
+                np.log1p(unit_sqft): 0.02570647395939741
+                poor: 0.16736928679089927
+                population: 0.20624291172969034
+                renters: 0.0545013330250222
+                sfdu: 0.01969673383672625
+                sum_residential_units: 0.12096007465688538
+            T-Score:
+                ave_income: 3.8141819827380656
+                ave_lot_sqft: -4.4868021227297925
+                ave_unit_sqft: 1.6308465978518938
+                hhsize: -2.813225958295573
+                jobs: 0.6195424532046037
+                np.log1p(residential_sales_price): -8.610847111809377e-15
+                np.log1p(unit_sqft): -20.924109216603775
+                poor: 0.9878719371986329
+                population: 2.639047639102479
+                renters: -10.53416180681111
+                sfdu: -0.012291200591042115
+                sum_residential_units: 1.6679758357542938
+        fitted: true
+        log_likelihoods:
+            convergence: -13219.672735404827
+            'null': -13815.51055796495
+            ratio: 0.04312817974118288
+        name: 2
+    3:
+        fit_parameters:
+            Coefficient:
+                ave_income: 1.8224740670331132
+                ave_lot_sqft: -0.19766020019733105
+                ave_unit_sqft: 0.40745911438488686
+                hhsize: -0.4696469272793113
+                jobs: 0.11515385436367431
+                np.log1p(residential_sales_price): -2.179353665022762e-13
+                np.log1p(unit_sqft): -0.5873008920358008
+                poor: 0.21017505924455512
+                population: 0.7230360887385874
+                renters: -0.6461544973268989
+                sfdu: -0.025677012235238224
+                sum_residential_units: -0.0762213090616947
+            Std. Error:
+                ave_income: 0.25396976316560393
+                ave_lot_sqft: 0.04792815005883638
+                ave_unit_sqft: 0.11525664619635587
+                hhsize: 0.1496386184571014
+                jobs: 0.03192584269264599
+                np.log1p(residential_sales_price): 3.888447817203702
+                np.log1p(unit_sqft): 0.024028256221191657
+                poor: 0.18413712750244773
+                population: 0.22029147876988633
+                renters: 0.056456086527967075
+                sfdu: 0.019620965387704175
+                sum_residential_units: 0.12265915075242878
+            T-Score:
+                ave_income: 7.17594899612025
+                ave_lot_sqft: -4.124094085723823
+                ave_unit_sqft: 3.535233132592832
+                hhsize: -3.1385409202635097
+                jobs: 3.606916674753885
+                np.log1p(residential_sales_price): -5.604687956414444e-14
+                np.log1p(unit_sqft): -24.442093784476643
+                poor: 1.1414051152816058
+                population: 3.282179105501678
+                renters: -11.445258378063603
+                sfdu: -1.3086518286877555
+                sum_residential_units: -0.6214074416309738
+        fitted: true
+        log_likelihoods:
+            convergence: -13239.52875128737
+            'null': -13815.51055796495
+            ratio: 0.041690953386121055
+        name: 3
+
+fitted: true
+
+choice_mode: aggregate
+
+remove_alts: true
+
+probability_mode: single_chooser
